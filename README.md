@@ -14,11 +14,11 @@
 1. 建议创建并激活虚拟环境。
 2. 安装依赖：
 
- ```pip install PyQt5 pypresence```
+   ```pip install PyQt5 pypresence```
 
 3. 启动程序：
 
- ```python RPC.py```
+   ```python RPC.py```
 
 注意
 
