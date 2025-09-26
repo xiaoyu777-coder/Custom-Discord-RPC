@@ -1,0 +1,4 @@
+.venv
+client_id.txt
+__pycache__/
+presence_config.json
