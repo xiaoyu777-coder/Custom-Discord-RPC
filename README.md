@@ -1,5 +1,4 @@
 # Custom-Discord-RPC
-# Custom-Discord-RPC
 
 一个用 PyQt5 编写的桌面 GUI 工具，用于编辑并将 Rich Presence 发布到本地运行的 Discord 客户端。
 
@@ -15,19 +14,17 @@
 1. 建议创建并激活虚拟环境。
 2. 安装依赖：
 
-```powershell
 pip install PyQt5 pypresence
-```
 
 3. 启动程序：
 
-```powershell
 python RPC.py
-```
 
 注意
 
 - 要把状态实际显示到 Discord 上，你必须在 `https://discord.com/developers/applications` 创建应用并使用对应的 `client_id`。
 - 本项目仅包含客户端发布逻辑，不会替你注册或伪装成别人的应用。
 
-License: 个人使用 / 教学用途。
+**MADE BY GITHUB COPILOT**
+
+**NO LICENSE**

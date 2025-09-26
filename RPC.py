@@ -110,7 +110,7 @@ class RPCSimulator(QWidget):
 		left_layout.addWidget(QLabel("Small image text"))
 		left_layout.addWidget(self.small_text_input)
 
-		left_layout.addWidget(QLabel("Client ID (可选)"))
+		left_layout.addWidget(QLabel("Client ID (必需)"))
 		left_layout.addWidget(self.client_id_input)
 		cid_btns = QHBoxLayout()
 		cid_btns.addWidget(self.load_client_btn)
@@ -277,12 +277,11 @@ class RPCSimulator(QWidget):
 
 	# -------------------- config --------------------
 	def save_config(self):
-		# require client id or warn before saving
+		# 强制要求 client id 才能保存配置
 		has_cid = bool(self.client_id_input.text().strip()) or os.path.isfile(APP_CLIENT_ID_FILE)
 		if not has_cid:
-			resp = QMessageBox.question(self, "未检测到 Client ID", "当前未提供 Client ID，保存配置可能导致无法连接到 Discord。是否继续保存？", QMessageBox.Yes | QMessageBox.No)
-			if resp != QMessageBox.Yes:
-				return
+			QMessageBox.warning(self, "缺少 Client ID", "必须提供 Client ID 才能保存配置。请在输入框中输入或从文件加载。")
+			return
 
 		data = {
 			"details": self.details_input.text(),
