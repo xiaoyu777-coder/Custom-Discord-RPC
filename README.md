@@ -1,4 +1,4 @@
-# Discord Rich Presence GUI (本地预览 + 可选真实 RPC)
+# Custom-Discord-RPC
 
 这是一个用 PyQt5 编写的小工具，用于构建并（可选）发布 Discord Rich Presence 到本地 Discord 客户端。
 
@@ -32,4 +32,4 @@ python RPC.py
 - 要把状态实际显示到 Discord 上，你必须在 `https://discord.com/developers/applications` 创建应用并使用对应的 `client_id`。
 - 本项目仅提供本地控制和发布的客户端逻辑，不会替你注册或伪装成别人的应用。
 
-License: 个人使用 / 教学用途。
+**MADE BY GITHUB COPILOT**
