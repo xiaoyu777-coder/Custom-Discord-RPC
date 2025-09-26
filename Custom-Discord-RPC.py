@@ -36,7 +36,7 @@ except Exception:
 APP_CLIENT_ID_FILE = os.path.join(os.path.dirname(__file__), "client_id.txt")
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "presence_config.json")
 
-# 默认 image keys（用户可自定义）
+
 DEFAULT_LARGE_IMAGE = "large_image_key"
 DEFAULT_SMALL_IMAGE = "small_image_key"
 
@@ -45,7 +45,7 @@ class RPCSimulator(QWidget):
 	"""Main GUI for managing Discord Rich Presence using a provided Client ID."""
 	def __init__(self):
 		super().__init__()
-		self.setWindowTitle("Discord Rich Presence 客户端")
+		self.setWindowTitle("Custom Discord RPC")
 		self.resize(760, 480)
 
 		# Inputs
@@ -101,13 +101,13 @@ class RPCSimulator(QWidget):
 		top_actions.addWidget(self.open_dev_btn)
 		top_actions.addWidget(self.theme_toggle_btn)
 		left_layout.addLayout(top_actions)
-		left_layout.addWidget(QLabel("Details（主要信息）"))
+		left_layout.addWidget(QLabel("主要信息"))
 		left_layout.addWidget(self.details_input)
-		left_layout.addWidget(QLabel("State（次级信息）"))
+		left_layout.addWidget(QLabel("次级信息"))
 		left_layout.addWidget(self.state_input)
-		left_layout.addWidget(QLabel("Large image text"))
+		left_layout.addWidget(QLabel("大图片标题"))
 		left_layout.addWidget(self.large_text_input)
-		left_layout.addWidget(QLabel("Small image text"))
+		left_layout.addWidget(QLabel("小图片标题"))
 		left_layout.addWidget(self.small_text_input)
 
 		left_layout.addWidget(QLabel("Client ID (必需)"))
@@ -117,9 +117,9 @@ class RPCSimulator(QWidget):
 		cid_btns.addWidget(self.save_client_btn)
 		left_layout.addLayout(cid_btns)
 
-		left_layout.addWidget(QLabel("Large image key"))
+		left_layout.addWidget(QLabel("大图片key"))
 		left_layout.addWidget(self.large_image_input)
-		left_layout.addWidget(QLabel("Small image key"))
+		left_layout.addWidget(QLabel("小图片key"))
 		left_layout.addWidget(self.small_image_input)
 
 		left_layout.addWidget(self.start_timestamp_chk)
