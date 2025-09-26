@@ -33,3 +33,4 @@ python RPC.py
 - 本项目仅提供本地控制和发布的客户端逻辑，不会替你注册或伪装成别人的应用。
 
 **MADE BY GITHUB COPILOT**
+**NO COPYRIGHT INTENTED**
