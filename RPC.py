@@ -25,12 +25,12 @@ except Exception as e:
 	print("需要安装 PyQt5: pip install PyQt5")
 	raise
 
-# pypresence 是可选的，用于真正向本地 Discord 客户端设置 Rich Presence
+# pypresence 为必须依赖，用于向本地 Discord 客户端设置 Rich Presence
 try:
 	from pypresence import Presence
-	PYPRESENCE_AVAILABLE = True
 except Exception:
-	PYPRESENCE_AVAILABLE = False
+	print("需要安装 pypresence: pip install pypresence")
+	sys.exit(1)
 
 
 APP_CLIENT_ID_FILE = os.path.join(os.path.dirname(__file__), "client_id.txt")
@@ -69,7 +69,7 @@ class RPCSimulator(QWidget):
 
 		# Client ID and image keys
 		self.client_id_input = QLineEdit()
-		self.client_id_input.setPlaceholderText("在此输入 Application Client ID（可选）")
+		self.client_id_input.setPlaceholderText("在此输入 Application Client ID（必需用于真实发布）")
 		self.load_client_btn = QPushButton("从文件加载 Client ID")
 		self.save_client_btn = QPushButton("保存 Client ID 到文件")
 		# large/small image 使用占位符（隐性文字），如果用户未输入则发布时使用占位符的值
@@ -254,14 +254,9 @@ class RPCSimulator(QWidget):
 
 	def check_real_rpc_availability(self):
 		has_client_id = bool(self.client_id_input.text().strip()) or os.path.isfile(APP_CLIENT_ID_FILE)
-		if PYPRESENCE_AVAILABLE and has_client_id:
-			self.start_real_btn.setEnabled(True)
-		else:
-			self.start_real_btn.setEnabled(False)
+		# pypresence 为必需，程序在导入失败时已退出。这里只检测是否存在 client_id
+		self.start_real_btn.setEnabled(bool(has_client_id))
 
-	def toggle_real_rpc_option(self):
-		if not PYPRESENCE_AVAILABLE and getattr(self, 'use_real_rpc_chk', None) and self.use_real_rpc_chk.isChecked():
-			QMessageBox.information(self, "缺少依赖", "未检测到 pypresence。请运行: pip install pypresence")
 
 	# -------------------- preview --------------------
 	def update_preview(self):
@@ -342,10 +337,6 @@ class RPCSimulator(QWidget):
 		return None
 
 	def start_real_presence(self):
-		if not PYPRESENCE_AVAILABLE:
-			QMessageBox.warning(self, "缺少依赖", "未安装 pypresence：pip install pypresence")
-			return
-
 		client_id = self.get_client_id()
 		if not client_id:
 			QMessageBox.warning(self, "缺少 client_id", f"请在输入框中输入 Client ID，或将其保存到 {APP_CLIENT_ID_FILE}。")
