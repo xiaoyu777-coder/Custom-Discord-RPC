@@ -1,4 +1,5 @@
-.venv
-client_id.txt
+.venv/
+client_id*.txt
 __pycache__/
 presence_config.json
+client_id_*.txt

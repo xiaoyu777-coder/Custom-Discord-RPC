@@ -33,7 +33,6 @@ except Exception:
 	sys.exit(1)
 
 
-APP_CLIENT_ID_FILE = os.path.join(os.path.dirname(__file__), "client_id.txt")
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "presence_config.json")
 
 
@@ -70,8 +69,6 @@ class RPCSimulator(QWidget):
 		# Client ID and image keys
 		self.client_id_input = QLineEdit()
 		self.client_id_input.setPlaceholderText("在此输入 Application Client ID（必需用于真实发布）")
-		self.load_client_btn = QPushButton("从文件加载 Client ID")
-		self.save_client_btn = QPushButton("保存 Client ID 到文件")
 		# large/small image 使用占位符（隐性文字），如果用户未输入则发布时使用占位符的值
 		self.large_image_input = QLineEdit()
 		self.large_image_input.setPlaceholderText(DEFAULT_LARGE_IMAGE)
@@ -112,10 +109,6 @@ class RPCSimulator(QWidget):
 
 		left_layout.addWidget(QLabel("Client ID (必需)"))
 		left_layout.addWidget(self.client_id_input)
-		cid_btns = QHBoxLayout()
-		cid_btns.addWidget(self.load_client_btn)
-		cid_btns.addWidget(self.save_client_btn)
-		left_layout.addLayout(cid_btns)
 
 		left_layout.addWidget(QLabel("大图片key"))
 		left_layout.addWidget(self.large_image_input)
@@ -157,8 +150,6 @@ class RPCSimulator(QWidget):
 
 		self.save_btn.clicked.connect(self.save_config)
 		self.load_btn.clicked.connect(self.load_config)
-		self.load_client_btn.clicked.connect(self.load_client_id_file)
-		self.save_client_btn.clicked.connect(self.save_client_id_file)
 
 		self.start_real_btn.clicked.connect(self.start_real_presence)
 		self.stop_real_btn.clicked.connect(self.stop_real_presence)
@@ -225,36 +216,11 @@ class RPCSimulator(QWidget):
 		self.setStyleSheet(sheet)
 
 	# -------------------- config / client id --------------------
-	def load_client_id_file(self):
-		if not os.path.isfile(APP_CLIENT_ID_FILE):
-			QMessageBox.information(self, "未找到文件", f"{APP_CLIENT_ID_FILE} 不存在。你也可以手动输入 Client ID。")
-			return
-		try:
-			with open(APP_CLIENT_ID_FILE, "r", encoding="utf-8") as f:
-				cid = f.read().strip()
-			self.client_id_input.setText(cid)
-			self.append_log("Loaded client_id from file")
-			self.check_real_rpc_availability()
-		except Exception as e:
-			QMessageBox.warning(self, "读取失败", f"读取 client_id 失败：{e}")
-
-	def save_client_id_file(self):
-		cid = self.client_id_input.text().strip()
-		if not cid:
-			QMessageBox.warning(self, "空 Client ID", "Client ID 为空，无法保存")
-			return
-		try:
-			with open(APP_CLIENT_ID_FILE, "w", encoding="utf-8") as f:
-				f.write(cid)
-			self.append_log("Saved client_id to file")
-			# update availability immediately after saving
-			self.check_real_rpc_availability()
-		except Exception as e:
-			QMessageBox.warning(self, "保存失败", f"保存 client_id 失败：{e}")
+	# (client_id file load/save removed) client id is expected to be entered in the input field
 
 	def check_real_rpc_availability(self):
-		has_client_id = bool(self.client_id_input.text().strip()) or os.path.isfile(APP_CLIENT_ID_FILE)
-		# pypresence 为必需，程序在导入失败时已退出。这里只检测是否存在 client_id
+		has_client_id = bool(self.client_id_input.text().strip())
+		# pypresence 为必需，程序在导入失败时已退出。这里只检测是否存在 client_id 输入
 		self.start_real_btn.setEnabled(bool(has_client_id))
 
 
@@ -278,9 +244,9 @@ class RPCSimulator(QWidget):
 	# -------------------- config --------------------
 	def save_config(self):
 		# 强制要求 client id 才能保存配置
-		has_cid = bool(self.client_id_input.text().strip()) or os.path.isfile(APP_CLIENT_ID_FILE)
+		has_cid = bool(self.client_id_input.text().strip())
 		if not has_cid:
-			QMessageBox.warning(self, "缺少 Client ID", "必须提供 Client ID 才能保存配置。请在输入框中输入或从文件加载。")
+			QMessageBox.warning(self, "缺少 Client ID", "必须提供 Client ID 才能保存配置。请在输入框中输入。")
 			return
 
 		data = {
@@ -293,20 +259,25 @@ class RPCSimulator(QWidget):
 			"client_id": self.client_id_input.text(),
 			"start_ts": self.start_timestamp_chk.isChecked(),
 		}
+		# 让用户选择保存路径（支持任意位置）
+		path, _ = QFileDialog.getSaveFileName(self, "保存配置为", CONFIG_FILE, "JSON 文件 (*.json);;All Files (*)")
+		if not path:
+			return
 		try:
-			with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+			with open(path, "w", encoding="utf-8") as f:
 				json.dump(data, f, ensure_ascii=False, indent=2)
-			self.append_log("Saved config to", CONFIG_FILE)
-			QMessageBox.information(self, "保存成功", f"配置已保存到 {CONFIG_FILE}")
+			self.append_log("Saved config to", path)
+			QMessageBox.information(self, "保存成功", f"配置已保存到 {path}")
 		except Exception as e:
 			QMessageBox.warning(self, "保存失败", f"保存配置失败：{e}")
 
 	def load_config(self):
-		if not os.path.isfile(CONFIG_FILE):
-			QMessageBox.warning(self, "未找到配置", f"{CONFIG_FILE} 不存在")
+		# 允许用户从任意路径加载配置
+		path, _ = QFileDialog.getOpenFileName(self, "加载配置", os.path.dirname(CONFIG_FILE), "JSON 文件 (*.json);;All Files (*)")
+		if not path:
 			return
 		try:
-			with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+			with open(path, "r", encoding="utf-8") as f:
 				data = json.load(f)
 			self.details_input.setText(data.get("details", ""))
 			self.state_input.setText(data.get("state", ""))
@@ -317,28 +288,21 @@ class RPCSimulator(QWidget):
 			self.client_id_input.setText(data.get("client_id", ""))
 			self.start_timestamp_chk.setChecked(data.get("start_ts", False))
 			self.update_preview()
-			self.append_log("Loaded config from", CONFIG_FILE)
-			QMessageBox.information(self, "加载完成", "配置已加载")
+			self.append_log("Loaded config from", path)
+			QMessageBox.information(self, "加载完成", f"配置已从 {path} 加载")
 		except Exception as e:
 			QMessageBox.warning(self, "加载失败", f"加载配置失败：{e}")
 
 	# -------------------- RPC actions --------------------
 	def get_client_id(self):
+		# 只从输入框读取 client_id，取消文件读取逻辑
 		cid = self.client_id_input.text().strip()
-		if cid:
-			return cid
-		if os.path.isfile(APP_CLIENT_ID_FILE):
-			try:
-				with open(APP_CLIENT_ID_FILE, "r", encoding="utf-8") as f:
-					return f.read().strip()
-			except Exception:
-				return None
-		return None
+		return cid or None
 
 	def start_real_presence(self):
 		client_id = self.get_client_id()
 		if not client_id:
-			QMessageBox.warning(self, "缺少 client_id", f"请在输入框中输入 Client ID，或将其保存到 {APP_CLIENT_ID_FILE}。")
+			QMessageBox.warning(self, "缺少 client_id", "请在输入框中输入 Client ID。")
 			return
 
 		try:
