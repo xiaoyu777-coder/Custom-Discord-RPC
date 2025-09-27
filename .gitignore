@@ -1,5 +1,5 @@
 .venv/
 client_id*.txt
 __pycache__/
-presence_config.json
-client_id_*.txt
+presence_config*.json
+.vscode/
