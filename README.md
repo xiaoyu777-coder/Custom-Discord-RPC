@@ -21,7 +21,7 @@
 - 3.启动程序：
 
    ```
-   python RPC.py
+   python Custom-Discord-RPC.py
    ```
 
 ## 注意
