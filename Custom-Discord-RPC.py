@@ -368,6 +368,12 @@ class RPCSimulator(QWidget):
 
 
 def main():
+	if sys.platform.startswith("win"):
+		import ctypes
+		whnd = ctypes.windll.kernel32.GetConsoleWindow()
+		if whnd != 0:
+			ctypes.windll.user32.ShowWindow(whnd, 0)
+			
 	app = QApplication(sys.argv)
 	win = RPCSimulator()
 	win.show()
@@ -376,4 +382,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
