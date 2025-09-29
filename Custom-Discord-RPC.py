@@ -35,7 +35,7 @@ except Exception:
 
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "presence_config.json")
 
-EGG = "im stuuupid"
+
 DEFAULT_LARGE_IMAGE = "large_image_key"
 DEFAULT_SMALL_IMAGE = "small_image_key"
 
