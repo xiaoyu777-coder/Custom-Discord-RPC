@@ -163,8 +163,6 @@ class RPCSimulator(QWidget):
 		self.dark_theme = True
 		self.apply_theme()
 
-		# ...existing code...
-
 		# 初始化显示摘要
 		self.update_preview()
 		self.check_real_rpc_availability()
