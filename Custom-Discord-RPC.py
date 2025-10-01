@@ -177,8 +177,6 @@ class RPCSimulator(QWidget):
 		self.log_area.clear()
 		self.append_log("Log cleared")
 
-	# ...existing code...
-
 	# -------------------- developer portal --------------------
 	def open_developer_portal(self):
 		import webbrowser
