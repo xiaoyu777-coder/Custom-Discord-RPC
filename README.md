@@ -7,7 +7,7 @@
 - 编辑 details / state、large/small image keys 与对应文本。
 - large/small image 支持占位符（placeholder）：如果输入框为空，发布时将使用占位 key。
 - 主题切换：支持暗色和浅色主题。
-- 配置保存/加载到 `presence_config.json`
+- 配置保存/加载
 
 ## 运行
 
