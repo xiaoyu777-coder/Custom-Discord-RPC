@@ -12,7 +12,6 @@ try:
 		QLineEdit,
 		QTextEdit,
 		QPushButton,
-		QComboBox,
 		QVBoxLayout,
 		QHBoxLayout,
 		QGroupBox,
@@ -51,12 +50,6 @@ class RPCSimulator(QWidget):
 		# Inputs
 		self.details_input = QLineEdit()
 		self.details_input.setPlaceholderText("Playing some cool stuff")
-		# Activity type selection (会显示在 details 前作为类型标签)
-		self.activity_type = QComboBox()
-		self.activity_type.addItems(["不显示", "正在玩", "正在听", "正在看", "竞赛", "自定义..."])
-		self.activity_custom = QLineEdit()
-		self.activity_custom.setPlaceholderText("自定义类型，例如：正在编程")
-		self.activity_custom.setVisible(False)
 		self.state_input = QLineEdit()
 		self.state_input.setPlaceholderText("In a match")
 		self.large_text_input = QLineEdit()
@@ -107,9 +100,6 @@ class RPCSimulator(QWidget):
 		left_layout.addLayout(top_actions)
 		left_layout.addWidget(QLabel("主要信息"))
 		left_layout.addWidget(self.details_input)
-		left_layout.addWidget(QLabel("类型（Activity）"))
-		left_layout.addWidget(self.activity_type)
-		left_layout.addWidget(self.activity_custom)
 		left_layout.addWidget(QLabel("次级信息"))
 		left_layout.addWidget(self.state_input)
 		left_layout.addWidget(QLabel("大图片标题"))
@@ -151,8 +141,6 @@ class RPCSimulator(QWidget):
 		self.client_id_input.textChanged.connect(self.check_real_rpc_availability)
 		# 字段变化时更新状态摘要
 		self.details_input.textChanged.connect(self.update_preview)
-		self.activity_type.currentIndexChanged.connect(self.on_activity_type_changed)
-		self.activity_custom.textChanged.connect(self.update_preview)
 		self.state_input.textChanged.connect(self.update_preview)
 		self.large_text_input.textChanged.connect(self.update_preview)
 		self.small_text_input.textChanged.connect(self.update_preview)
@@ -166,9 +154,6 @@ class RPCSimulator(QWidget):
 		self.start_real_btn.clicked.connect(self.start_real_presence)
 		self.stop_real_btn.clicked.connect(self.stop_real_presence)
 		self.clear_log_btn.clicked.connect(self.clear_log)
-		
-		# activity type handler
-		self.activity_type.currentIndexChanged.connect(self.on_activity_type_changed)
 
 		# internal
 		self.rpc_client = None
@@ -238,32 +223,13 @@ class RPCSimulator(QWidget):
 		# pypresence 为必需，程序在导入失败时已退出。这里只检测是否存在 client_id 输入
 		self.start_real_btn.setEnabled(bool(has_client_id))
 	
-	def on_activity_type_changed(self, idx):
-		# 显示/隐藏自定义输入
-		if self.activity_type.currentText() == "自定义...":
-			self.activity_custom.setVisible(True)
-		else:
-			self.activity_custom.setVisible(False)
-		self.update_preview()
+	# activity UI 已移除
 
 
 	# -------------------- preview --------------------
 	def update_preview(self):
 		# 简洁的状态摘要，替代之前的 HTML 预览
-		# activity prefix
-		type_text = self.activity_type.currentText()
-		if type_text == "不显示":
-			prefix = ""
-		elif type_text == "自定义...":
-			prefix = self.activity_custom.text().strip()
-		else:
-			prefix = type_text
-
 		details = self.details_input.text() or "(无详情)"
-		if prefix:
-			details_display = f"{prefix} {details}"
-		else:
-			details_display = details
 		state = self.state_input.text() or "(无状态)"
 		show_ts = self.start_timestamp_chk.isChecked()
 
@@ -274,7 +240,7 @@ class RPCSimulator(QWidget):
 		elif show_ts:
 			timestamp_str = f" • Started: {datetime.now().strftime('%H:%M:%S')}"
 
-		summary = f"{details_display} — {state}{timestamp_str}"
+		summary = f"{details} — {state}{timestamp_str}"
 		self.status_label.setText("状态：" + summary)
 
 	# -------------------- config --------------------
@@ -292,8 +258,6 @@ class RPCSimulator(QWidget):
 			"small_text": self.small_text_input.text(),
 			"large_image": self.large_image_input.text(),
 			"small_image": self.small_image_input.text(),
-			"activity_type": self.activity_type.currentText(),
-			"activity_custom": self.activity_custom.text(),
 			"client_id": self.client_id_input.text(),
 			"start_ts": self.start_timestamp_chk.isChecked(),
 		}
@@ -324,13 +288,7 @@ class RPCSimulator(QWidget):
 			self.large_image_input.setText(data.get("large_image", DEFAULT_LARGE_IMAGE))
 			self.small_image_input.setText(data.get("small_image", DEFAULT_SMALL_IMAGE))
 			self.client_id_input.setText(data.get("client_id", ""))
-			# activity
-			atype = data.get("activity_type", "不显示")
-			if atype in [self.activity_type.itemText(i) for i in range(self.activity_type.count())]:
-				self.activity_type.setCurrentText(atype)
-			else:
-				self.activity_type.setCurrentIndex(0)
-			self.activity_custom.setText(data.get("activity_custom", ""))
+			# ...existing code...
 			self.start_timestamp_chk.setChecked(data.get("start_ts", False))
 			self.update_preview()
 			self.append_log("Loaded config from", path)
